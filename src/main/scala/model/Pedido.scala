@@ -27,6 +27,17 @@ object Pedido {
 
   // Funcao para cancelar pedido cadastrado
   def cancelarPedido() : String = {
+    println(Relatorio.visualizar())
+    val id = scala.io.StdIn.readLine("Remover ID: ")
+    val pedidos = FileIO.ler("pedido.txt","").split("@")
+    var lista = ""
+    for (i <- 0 to pedidos.length-1) {
+      var itens = pedidos(i).split("#")
+      if (id != itens(0)){
+        lista = lista+itens(0)+"#"+itens(1)+"#"+itens(2)+"#"+"@"
+      }
+      FileIO.subescrever("pedido.txt", lista)
+    }
     return "Pedido cancelado com sucesso!"
   }
 }
