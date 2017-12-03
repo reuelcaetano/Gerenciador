@@ -13,3 +13,5 @@ Trata-se de um Gerenciador de Pizzaria (apesar de ser genérico), o qual permite
 No commit inicial o projeto foi desenvolvido utilizando o paradigma imperativo.
 
 Na versão final, o projeto está implementado sob o paradigma funcional, apesar de não puro.
+
+Foi utilizada persistência em arquivos de texto.
