@@ -9,62 +9,91 @@ object Cadastro {
   // tamanho - [P(pequena), M(media), G(grande)]
   // preco - valor em reais com duas casas decimais R$[00.00]
   // @ - caracter especial para reconhecer o final do conjunto de valores associados
-  def cadastrar() : String = {
-    val id = FileIO.ler("menuID.txt", "1")
-    val sabor = scala.io.StdIn.readLine("Sabor: ")
-    val tam = scala.io.StdIn.readLine("Tamanho [P,M,G]: ")
-    val price = scala.io.StdIn.readLine("Preco: ")
-    FileIO.escrever("menu.txt", id+"#"+sabor+"#"+tam+"#"+price+"@")
-    FileIO.subescrever("menuID.txt", (id.toInt+1).toString)
+  def cadastrar(id: String, sabor: String, tam: String, preco: String): String = {
+    FileIO.escrever("menu.txt", id + "#" + sabor + "#" + tam + "#" + preco + "@")
+    FileIO.subescrever("menuID.txt", (id.toInt + 1).toString)
     return "Cadastrado realizado!"
   }
 
   // Funcao para remover um produto por sua ID
-  def remover() : String = {
-    println(Cardapio.cardapio())
-    val id = scala.io.StdIn.readLine("Remover ID: ")
-    val cardapio = FileIO.ler("menu.txt","").split("@")
-    var produtos = ""
-    for (i <- 0 to cardapio.length-1) {
-      var itens = cardapio(i).split("#")
-      if (id != itens(0)){
-        produtos = produtos+itens(0)+"#"+itens(1)+"#"+itens(2)+"#"+itens(3)+"@"
+  def remover(cardapio: Array[String], id: String): String = {
+    if (existeProduto(cardapio, id)) {
+      var produtos = ""
+      cardapio.foreach { e =>
+        if (e.split("#")(0) != id) produtos += (e + "@")
       }
       FileIO.subescrever("menu.txt", produtos)
+      return "Item removido!"
+    } else {
+      return "ID informado não existe"
     }
-    return "Item removido!"
+
   }
 
   // Funcao para alterar um produto por sua ID
-  def alterar() : String = {
-    println(Cardapio.cardapio())
-      val id = scala.io.StdIn.readLine("Alterar ID: ")
-      val cardapio = FileIO.ler("menu.txt","").split("@")
+  def alterar(cardapio: Array[String], id: String): String = {
+    if (existeProduto(cardapio, id)) {
       var produtos = ""
-      for (i <- 0 to cardapio.length-1) {
-        var itens = cardapio(i).split("#")
-        if (id != itens(0)) {
-          produtos = produtos+itens(0)+"#"+itens(1)+"#"+itens(2)+"#"+itens(3)+"@"
-        }
-      if (id == itens(0)){
-        val input = scala.io.StdIn.readLine("[0] Alterar Sabor | [1] Alterar Tamanho | [2] Alterar Preco")
-        input match {
-          case "0" => {
-            val sabor = scala.io.StdIn.readLine("Novo Sabor: ")
-            produtos = produtos+itens(0)+"#"+sabor+"#"+itens(2)+"#"+itens(3)+"@"
-          }
-          case "1" => {
-            val tamanho = scala.io.StdIn.readLine("Novo Tamanho: ")
-            produtos = produtos+itens(0)+"#"+itens(1)+"#"+tamanho+"#"+itens(3)+"@"
-          }
-          case "2" => {
-            val preco = scala.io.StdIn.readLine("Novo Preco: ")
-            produtos = produtos+itens(0)+"#"+itens(1)+"#"+itens(2)+"#"+preco+"@"
+      cardapio.foreach { e =>
+        if (e.split("#")(0) != id) {
+          produtos += (e + "@")
+        } else {
+          println("\n" + Cardapio.criaProduto(e))
+          val input = scala.io.StdIn.readLine("[0] Alterar Sabor | [1] Alterar Tamanho | [2] Alterar Preço\nAção: ")
+          input match {
+            case "0" => {
+              produtos += alterarSabor(e)
+            }
+            case "1" => {
+              produtos += alterarTamanho(e)
+            }
+            case "2" => {
+              produtos += alterarPreco(e)
+            }
           }
         }
       }
+      FileIO.subescrever("menu.txt", produtos)
+      return "Item alterado!"
+    } else {
+      return "ID informado não existe"
     }
-    FileIO.subescrever("menu.txt", produtos)
-    return "Item alterado!"
+  }
+
+  def alterarSabor(produto: String): String = {
+    val dados = produto.split("#")
+    val novo = scala.io.StdIn.readLine("Novo sabor: ")
+    return dados(0) + "#" + novo + "#" + dados(2) + "#" + dados(3) + "@"
+  }
+
+  def alterarTamanho(produto: String): String = {
+    val dados = produto.split("#")
+    val novo = scala.io.StdIn.readLine("Novo tamanho: ")
+    return dados(0) + "#" + dados(1) + "#" + novo + "#" + dados(3) + "@"
+  }
+
+  def alterarPreco(produto: String): String = {
+    val dados = produto.split("#")
+    val novo = scala.io.StdIn.readLine("Novo preço: ")
+    return dados(0) + "#" + dados(1) + "#" + dados(2) + "#" + novo + "@"
+  }
+
+  // verifica se existe um produto com determinado ID
+  def existeProduto(cardapio: Array[String], id: String): Boolean = {
+    cardapio.foreach { e =>
+      if (e.split("#")(0) == id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  def getProduto(cardapio: Array[String], id: String): String = {
+    cardapio.foreach { e =>
+      if (e.split("#")(0) == id) {
+        return Cardapio.criaProduto(e)
+      }
+    }
+    return ""
   }
 }
