@@ -3,16 +3,20 @@ package model
 object Relatorio {
 
   // Formata e exibe o relatorio de vendas efetuadas
-  def visualizar() : String = {
-    val pedidos = FileIO.ler("pedido.txt","").split("@")
-    var pedidoUnit = ""
+  def visualizar(pedidos: Array[String]): String = {
     if (pedidos(0) != "") {
-      for (i <- 0 to pedidos.length - 1) {
-        var itens = pedidos(i).split("#")
-        pedidoUnit = pedidoUnit + "ID:" + itens(0) +" "+ itens(1).toUpperCase +"\n"+ itens(2).toUpperCase+"\n"
+      var relatorio = "\n[RELATORIO DE PEDIDOS]\n---------------------------------------\n"
+      pedidos.foreach { e =>
+        relatorio += formataPedido(e) + "\n\n"
       }
-      return "\n[RELATORIO DE PEDIDOS]\n---------------------------------------\n" + pedidoUnit
+      relatorio += "---------------------------------------\n"
+      return relatorio
     }
-    return "Nao houve pedidos!"
+    return "Ainda não há nenhum pedido."
+  }
+
+  def formataPedido(pedido: String): String = {
+    val dados = pedido.split("#")
+    return "Pedido nº " + dados(0) + ":\nData do pedido: " + dados(1).toUpperCase + "\n" + dados(2).toUpperCase
   }
 }
